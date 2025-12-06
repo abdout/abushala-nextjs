@@ -4,7 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { LogOut, Menu, X } from "lucide-react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { LogOut, Menu, X, User } from "lucide-react";
 import { logout } from "@/components/auth/logout-action";
 
 interface NavbarProps {
@@ -64,17 +65,29 @@ export function Navbar({ user }: NavbarProps) {
               </Link>
             ))}
             {isLoggedIn && (
-              <form action={handleLogout}>
-                <Button
-                  type="submit"
-                  variant="outline"
-                  size="sm"
-                  className="gap-2"
-                >
-                  <LogOut className="w-4 h-4" />
-                  تسجيل خروج
-                </Button>
-              </form>
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
+                  <Avatar className="h-8 w-8 border-2 border-amber-200">
+                    <AvatarFallback className="bg-gradient-to-br from-amber-400 to-orange-500 text-white text-sm">
+                      {user?.name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || <User className="w-4 h-4" />}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="text-sm font-medium text-gray-700 hidden lg:block">
+                    {user?.name || user?.email?.split("@")[0]}
+                  </span>
+                </div>
+                <form action={handleLogout}>
+                  <Button
+                    type="submit"
+                    variant="outline"
+                    size="sm"
+                    className="gap-2"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    خروج
+                  </Button>
+                </form>
+              </div>
             )}
           </div>
 
@@ -110,17 +123,29 @@ export function Navbar({ user }: NavbarProps) {
                 </Link>
               ))}
               {isLoggedIn && (
-                <form action={handleLogout}>
-                  <Button
-                    type="submit"
-                    variant="outline"
-                    size="sm"
-                    className="gap-2 w-full"
-                  >
-                    <LogOut className="w-4 h-4" />
-                    تسجيل خروج
-                  </Button>
-                </form>
+                <div className="space-y-3 pt-3 border-t">
+                  <div className="flex items-center gap-2 px-4">
+                    <Avatar className="h-8 w-8 border-2 border-amber-200">
+                      <AvatarFallback className="bg-gradient-to-br from-amber-400 to-orange-500 text-white text-sm">
+                        {user?.name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || <User className="w-4 h-4" />}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="text-sm font-medium text-gray-700">
+                      {user?.name || user?.email?.split("@")[0]}
+                    </span>
+                  </div>
+                  <form action={handleLogout}>
+                    <Button
+                      type="submit"
+                      variant="outline"
+                      size="sm"
+                      className="gap-2 w-full"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      تسجيل خروج
+                    </Button>
+                  </form>
+                </div>
               )}
             </div>
           </div>

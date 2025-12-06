@@ -4,7 +4,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TrendingDown, TrendingUp } from "lucide-react";
-import { useMemo } from "react";
+import { useState, useEffect } from "react";
 
 interface Currency {
   id: string;
@@ -21,10 +21,29 @@ interface CurrencyTableProps {
   currencies: Currency[];
 }
 
+// Format date consistently to avoid hydration mismatch
+function formatDate(date: Date | string): string {
+  const d = new Date(date);
+  const day = d.getDate().toString().padStart(2, "0");
+  const month = (d.getMonth() + 1).toString().padStart(2, "0");
+  const hours = d.getHours().toString().padStart(2, "0");
+  const minutes = d.getMinutes().toString().padStart(2, "0");
+  return `${day}/${month} ${hours}:${minutes}`;
+}
+
 export function CurrencyTable({ currencies }: CurrencyTableProps) {
-  const lastUpdatedLabel = useMemo(() => {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const lastUpdatedLabel = (() => {
     if (!currencies.length) {
       return "لا توجد بيانات";
+    }
+    if (!mounted) {
+      return "...";
     }
 
     const latest = currencies.reduce(
@@ -33,13 +52,8 @@ export function CurrencyTable({ currencies }: CurrencyTableProps) {
       currencies[0]
     );
 
-    return new Date(latest.updatedAt).toLocaleString("ar-LY", {
-      hour: "2-digit",
-      minute: "2-digit",
-      day: "2-digit",
-      month: "2-digit",
-    });
-  }, [currencies]);
+    return formatDate(latest.updatedAt);
+  })();
 
   return (
     <Card className="shadow-lg">
@@ -87,12 +101,7 @@ export function CurrencyTable({ currencies }: CurrencyTableProps) {
                       {currency.sellPrice.toFixed(2)} د.ل
                     </TableCell>
                     <TableCell className="text-center text-sm text-gray-500">
-                      {currency.updatedAt ? new Date(currency.updatedAt).toLocaleString("ar-LY", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                        day: "2-digit",
-                        month: "2-digit",
-                      }) : "-"}
+                      {mounted && currency.updatedAt ? formatDate(currency.updatedAt) : "-"}
                     </TableCell>
                     <TableCell className="text-center">
                       {currency.change === 0 ? (
