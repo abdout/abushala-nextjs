@@ -13,7 +13,8 @@ interface Currency {
   buyPrice: number;
   sellPrice: number;
   change: number;
-  updatedAt: string;
+  updatedAt: Date | string;
+  createdAt?: Date | string;
 }
 
 interface CurrencyTableProps {
