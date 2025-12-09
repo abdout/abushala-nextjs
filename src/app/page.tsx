@@ -27,17 +27,17 @@ export default async function HomePage() {
       <Navbar user={session?.user} />
 
       {/* Hero Section */}
-      <section className="hero-gradient text-white py-20">
+      <section className="gradient-hero text-primary-foreground py-16">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
             مكتب أبو شعالة للتحويلات المالية
           </h1>
-          <p className="text-lg md:text-xl text-white/80 mb-8">
+          <p className="text-lg md:text-xl text-primary-foreground/90 mb-6">
             أفضل أسعار صرف العملات الأجنبية في مصراتة - ليبيا
           </p>
           <a
             href="#currencies"
-            className="inline-flex items-center gap-2 bg-gray-800/50 hover:bg-gray-800/70 border border-white/20 text-white px-6 py-3 rounded-lg transition-colors"
+            className="inline-flex items-center gap-2 bg-gray-700/60 hover:bg-gray-700/80 border border-white/30 text-white px-6 py-3 rounded-lg transition-colors shadow-lg"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -48,7 +48,7 @@ export default async function HomePage() {
       </section>
 
       {/* Main Content */}
-      <main className="flex-1 container mx-auto px-4 py-12">
+      <main className="flex-1 container mx-auto px-4 py-8 space-y-10">
         <div id="currencies">
           <CurrencyTable currencies={currencies} />
         </div>

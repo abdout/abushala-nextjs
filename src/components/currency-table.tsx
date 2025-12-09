@@ -1,7 +1,8 @@
 "use client";
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { TrendingDown, TrendingUp } from "lucide-react";
 import { useState, useEffect } from "react";
 
@@ -57,72 +58,79 @@ export function CurrencyTable({ currencies }: CurrencyTableProps) {
   })();
 
   return (
-    <Card className="shadow-lg border-0">
-      <CardHeader className="pb-4">
+    <Card className="shadow-medium">
+      <CardHeader>
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-blue-600">أسعار العملات</h2>
-          <span className="text-sm text-gray-500 border border-gray-200 rounded-full px-4 py-1.5">
+          <CardTitle className="text-xl font-bold">أسعار العملات</CardTitle>
+          <Badge variant="outline" className="text-xs">
             آخر تحديث: {lastUpdatedLabel}
-          </span>
+          </Badge>
         </div>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow className="border-b border-gray-100">
-              <TableHead className="text-right font-semibold text-gray-600">العملة</TableHead>
-              <TableHead className="text-center font-semibold text-gray-600">الرمز</TableHead>
-              <TableHead className="text-center font-semibold text-gray-600">سعر الشراء</TableHead>
-              <TableHead className="text-center font-semibold text-gray-600">سعر البيع</TableHead>
-              <TableHead className="text-center font-semibold text-gray-600">آخر تحديث</TableHead>
-              <TableHead className="text-center font-semibold text-gray-600">التغيير</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {currencies.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={6} className="text-center text-gray-500 py-8">
-                  لا توجد عملات مضافة حاليًا. يرجى إضافة بيانات من لوحة التحكم.
-                </TableCell>
+        <div className="rounded-lg border border-border overflow-hidden">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-muted/50">
+                <TableHead className="text-right font-bold">العملة</TableHead>
+                <TableHead className="text-center font-bold">الرمز</TableHead>
+                <TableHead className="text-center font-bold">سعر الشراء</TableHead>
+                <TableHead className="text-center font-bold">سعر البيع</TableHead>
+                <TableHead className="text-center font-bold">آخر تحديث</TableHead>
+                <TableHead className="text-center font-bold">التغيير</TableHead>
               </TableRow>
-            ) : (
-              currencies.map((currency) => (
-                <TableRow key={currency.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
-                  <TableCell className="font-medium py-4">{currency.name}</TableCell>
-                  <TableCell className="text-center py-4">
-                    <span className="inline-flex items-center justify-center bg-blue-600 text-white text-xs font-semibold px-3 py-1 rounded">
-                      {currency.code}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-center py-4 font-medium">
-                    {currency.buyPrice.toFixed(2)} د.ل
-                  </TableCell>
-                  <TableCell className="text-center py-4 font-medium">
-                    {currency.sellPrice.toFixed(2)} د.ل
-                  </TableCell>
-                  <TableCell className="text-center py-4 text-sm text-gray-500">
-                    {mounted && currency.updatedAt ? formatDate(currency.updatedAt) : "-"}
-                  </TableCell>
-                  <TableCell className="text-center py-4">
-                    {currency.change === 0 ? (
-                      <span className="text-gray-400">-</span>
-                    ) : currency.change > 0 ? (
-                      <div className="flex items-center justify-center gap-1 text-green-600">
-                        <TrendingUp className="w-4 h-4" />
-                        <span className="text-sm font-medium">+{currency.change.toFixed(2)}</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center justify-center gap-1 text-red-600">
-                        <TrendingDown className="w-4 h-4" />
-                        <span className="text-sm font-medium">{currency.change.toFixed(2)}</span>
-                      </div>
-                    )}
+            </TableHeader>
+            <TableBody>
+              {currencies.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                    لا توجد عملات مضافة حاليًا. يرجى إضافة بيانات من لوحة التحكم.
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+              ) : (
+                currencies.map((currency) => (
+                  <TableRow key={currency.id} className="hover:bg-muted/30 transition-smooth">
+                    <TableCell className="font-medium">{currency.name}</TableCell>
+                    <TableCell className="text-center">
+                      <Badge className="font-mono bg-blue-600 text-white border-transparent">
+                        {currency.code}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-center font-semibold text-primary">
+                      {currency.buyPrice.toFixed(2)} د.ل
+                    </TableCell>
+                    <TableCell className="text-center font-semibold text-primary">
+                      {currency.sellPrice.toFixed(2)} د.ل
+                    </TableCell>
+                    <TableCell className="text-center text-sm text-muted-foreground">
+                      {mounted && currency.updatedAt ? formatDate(currency.updatedAt) : "-"}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {currency.change === 0 ? (
+                        <span className="text-muted-foreground">-</span>
+                      ) : currency.change > 0 ? (
+                        <div className="flex items-center justify-center gap-1 text-green-600">
+                          <TrendingUp className="w-4 h-4" />
+                          <span className="text-sm font-medium">+{currency.change.toFixed(2)}</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-center gap-1 text-red-600">
+                          <TrendingDown className="w-4 h-4" />
+                          <span className="text-sm font-medium">{currency.change.toFixed(2)}</span>
+                        </div>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
+        <div className="mt-4 p-3 bg-muted/30 rounded-lg">
+          <p className="text-sm text-muted-foreground text-center">
+            الأسعار المعروضة استرشادية وقابلة للتغيير في أي وقت. للحصول على السعر الفعلي يرجى التواصل مع المكتب مباشرة.
+          </p>
+        </div>
       </CardContent>
     </Card>
   );

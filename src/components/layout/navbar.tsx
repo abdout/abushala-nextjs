@@ -62,8 +62,8 @@ export function Navbar({ user }: NavbarProps) {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`font-medium transition-smooth hover:text-accent ${
-                  isActive(link.href) ? "text-accent" : "text-foreground"
+                className={`font-medium transition-smooth hover:text-accent relative ${
+                  isActive(link.href) ? "text-accent after:absolute after:bottom-[-4px] after:right-0 after:w-full after:h-[2px] after:bg-accent" : "text-foreground"
                 }`}
               >
                 {link.label}
