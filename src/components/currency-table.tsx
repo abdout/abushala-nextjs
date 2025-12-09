@@ -61,14 +61,14 @@ export function CurrencyTable({ currencies }: CurrencyTableProps) {
     <Card className="shadow-medium">
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle className="text-xl font-bold">أسعار العملات</CardTitle>
-          <Badge variant="outline" className="text-xs">
+          <CardTitle className="text-xl font-bold text-blue-600">أسعار العملات</CardTitle>
+          <Badge variant="outline" className="text-xs rounded-full">
             آخر تحديث: {lastUpdatedLabel}
           </Badge>
         </div>
       </CardHeader>
       <CardContent>
-        <div className="rounded-lg border border-border overflow-hidden">
+        <div className="overflow-hidden">
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/50">
