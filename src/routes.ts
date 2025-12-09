@@ -1,8 +1,10 @@
 /**
  * Public routes - accessible without authentication
  */
-export const publicRoutes = [
-
+export const publicRoutes: string[] = [
+  "/",
+  "/about",
+  "/contact",
 ];
 
 /**

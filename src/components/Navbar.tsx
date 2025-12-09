@@ -1,4 +1,7 @@
-import { Link, useNavigate, useLocation } from "react-router-dom";
+"use client";
+
+import Link from "next/link";
+import { useRouter, usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { LogOut, Menu, X } from "lucide-react";
 import { useState } from "react";
@@ -10,8 +13,8 @@ interface NavbarProps {
 }
 
 const Navbar = ({ isAuthenticated, onLogout }: NavbarProps) => {
-  const navigate = useNavigate();
-  const location = useLocation();
+  const router = useRouter();
+  const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { currentUser, logout } = useDataStore();
 
@@ -22,24 +25,24 @@ const Navbar = ({ isAuthenticated, onLogout }: NavbarProps) => {
   const handleLogout = () => {
     logout();
     onLogout?.();
-    navigate("/login");
+    router.push("/login");
   };
 
   const navLinks = [
-    { to: "/", label: "الرئيسية" },
-    { to: "/about", label: "من نحن" },
-    { to: "/contact", label: "تواصل معنا" },
-    ...(isAdmin ? [{ to: "/admin", label: "لوحة التحكم" }] : []),
+    { href: "/", label: "الرئيسية" },
+    { href: "/about", label: "من نحن" },
+    { href: "/contact", label: "تواصل معنا" },
+    ...(isAdmin ? [{ href: "/admin", label: "لوحة التحكم" }] : []),
   ];
 
-  const isActive = (path: string) => location.pathname === path;
+  const isActive = (path: string) => pathname === path;
 
   return (
     <nav className="bg-card shadow-soft sticky top-0 z-50 border-b border-border">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 group">
+          <Link href="/" className="flex items-center gap-2 group">
             <img
               src="/02.png"
               alt="شعار مكتب أبو شعالة"
@@ -55,9 +58,9 @@ const Navbar = ({ isAuthenticated, onLogout }: NavbarProps) => {
           <div className="hidden md:flex items-center gap-6">
             {navLinks.map((link) => (
               <Link
-                key={link.to}
-                to={link.to}
-                className={`font-medium transition-smooth hover:text-accent ${isActive(link.to) ? "text-accent" : "text-foreground"
+                key={link.href}
+                href={link.href}
+                className={`font-medium transition-smooth hover:text-accent ${isActive(link.href) ? "text-accent" : "text-foreground"
                   }`}
               >
                 {link.label}
@@ -95,10 +98,10 @@ const Navbar = ({ isAuthenticated, onLogout }: NavbarProps) => {
             <div className="flex flex-col gap-3">
               {navLinks.map((link) => (
                 <Link
-                  key={link.to}
-                  to={link.to}
+                  key={link.href}
+                  href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`py-2 px-4 rounded-lg font-medium transition-smooth ${isActive(link.to)
+                  className={`py-2 px-4 rounded-lg font-medium transition-smooth ${isActive(link.href)
                       ? "bg-accent/10 text-accent"
                       : "hover:bg-muted"
                     }`}
