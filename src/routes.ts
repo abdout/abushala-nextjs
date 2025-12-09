@@ -2,9 +2,7 @@
  * Public routes - accessible without authentication
  */
 export const publicRoutes = [
-  "/",
-  "/about",
-  "/contact",
+
 ];
 
 /**
