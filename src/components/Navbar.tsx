@@ -66,17 +66,15 @@ const Navbar = ({ isAuthenticated, onLogout }: NavbarProps) => {
                 {link.label}
               </Link>
             ))}
-            {showLogoutButton && (
-              <Button
-                onClick={handleLogout}
-                variant="outline"
-                size="sm"
-                className="gap-2"
-              >
-                <LogOut className="w-4 h-4" />
-                تسجيل خروج
-              </Button>
-            )}
+            <Button
+              onClick={handleLogout}
+              variant="outline"
+              size="sm"
+              className="gap-2"
+            >
+              <LogOut className="w-4 h-4" />
+              تسجيل خروج
+            </Button>
           </div>
 
           {/* Mobile Menu Button */}
@@ -109,20 +107,18 @@ const Navbar = ({ isAuthenticated, onLogout }: NavbarProps) => {
                   {link.label}
                 </Link>
               ))}
-              {showLogoutButton && (
-                <Button
-                  onClick={() => {
-                    handleLogout();
-                    setMobileMenuOpen(false);
-                  }}
-                  variant="outline"
-                  size="sm"
-                  className="gap-2 w-full"
-                >
-                  <LogOut className="w-4 h-4" />
-                  تسجيل خروج
-                </Button>
-              )}
+              <Button
+                onClick={() => {
+                  handleLogout();
+                  setMobileMenuOpen(false);
+                }}
+                variant="outline"
+                size="sm"
+                className="gap-2 w-full"
+              >
+                <LogOut className="w-4 h-4" />
+                تسجيل خروج
+              </Button>
             </div>
           </div>
         )}
