@@ -1,39 +1,45 @@
-"use client";
-
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { LogOut, Menu, X } from "lucide-react";
 import { useState } from "react";
-import { useSession, signOut } from "next-auth/react";
+import { useDataStore } from "@/context/DataContext";
 
-const Navbar = () => {
-  const pathname = usePathname();
+interface NavbarProps {
+  isAuthenticated?: boolean;
+  onLogout?: () => void;
+}
+
+const Navbar = ({ isAuthenticated, onLogout }: NavbarProps) => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { data: session, status } = useSession();
+  const { currentUser, logout } = useDataStore();
 
-  const isAdmin = session?.user?.role === "ADMIN";
-  const isLoggedIn = status === "authenticated";
+  const isAdmin = currentUser?.role === "admin";
+  const isLoggedInFromContext = Boolean(currentUser);
+  const showLogoutButton = typeof isAuthenticated === "boolean" ? isAuthenticated : isLoggedInFromContext;
 
-  const handleLogout = async () => {
-    await signOut({ callbackUrl: "/login" });
+  const handleLogout = () => {
+    logout();
+    onLogout?.();
+    navigate("/login");
   };
 
   const navLinks = [
-    { href: "/", label: "الرئيسية" },
-    { href: "/about", label: "من نحن" },
-    { href: "/contact", label: "تواصل معنا" },
-    ...(isAdmin ? [{ href: "/admin", label: "لوحة التحكم" }] : []),
+    { to: "/", label: "الرئيسية" },
+    { to: "/about", label: "من نحن" },
+    { to: "/contact", label: "تواصل معنا" },
+    ...(isAdmin ? [{ to: "/admin", label: "لوحة التحكم" }] : []),
   ];
 
-  const isActive = (path: string) => pathname === path;
+  const isActive = (path: string) => location.pathname === path;
 
   return (
     <nav className="bg-card shadow-soft sticky top-0 z-50 border-b border-border">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group">
+          <Link to="/" className="flex items-center gap-2 group">
             <img
               src="/02.png"
               alt="شعار مكتب أبو شعالة"
@@ -49,16 +55,15 @@ const Navbar = () => {
           <div className="hidden md:flex items-center gap-6">
             {navLinks.map((link) => (
               <Link
-                key={link.href}
-                href={link.href}
-                className={`font-medium transition-smooth hover:text-accent ${
-                  isActive(link.href) ? "text-accent" : "text-foreground"
-                }`}
+                key={link.to}
+                to={link.to}
+                className={`font-medium transition-smooth hover:text-accent ${isActive(link.to) ? "text-accent" : "text-foreground"
+                  }`}
               >
                 {link.label}
               </Link>
             ))}
-            {isLoggedIn && (
+            {showLogoutButton && (
               <Button
                 onClick={handleLogout}
                 variant="outline"
@@ -90,19 +95,18 @@ const Navbar = () => {
             <div className="flex flex-col gap-3">
               {navLinks.map((link) => (
                 <Link
-                  key={link.href}
-                  href={link.href}
+                  key={link.to}
+                  to={link.to}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`py-2 px-4 rounded-lg font-medium transition-smooth ${
-                    isActive(link.href)
+                  className={`py-2 px-4 rounded-lg font-medium transition-smooth ${isActive(link.to)
                       ? "bg-accent/10 text-accent"
                       : "hover:bg-muted"
-                  }`}
+                    }`}
                 >
                   {link.label}
                 </Link>
               ))}
-              {isLoggedIn && (
+              {showLogoutButton && (
                 <Button
                   onClick={() => {
                     handleLogout();

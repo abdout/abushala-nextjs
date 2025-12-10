@@ -1,8 +1,8 @@
 "use client";
 
-import { DataProvider } from "@/context/DataContext";
+import { SessionProvider } from "next-auth/react";
 import { ReactNode } from "react";
 
 export function Providers({ children }: { children: ReactNode }) {
-  return <DataProvider>{children}</DataProvider>;
+  return <SessionProvider>{children}</SessionProvider>;
 }
