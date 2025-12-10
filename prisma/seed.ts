@@ -1,69 +1,51 @@
-import * as dotenv from "dotenv";
-dotenv.config();
-
 import { PrismaClient } from "@prisma/client";
-import { Pool } from "pg";
-import { PrismaPg } from "@prisma/adapter-pg";
 import bcrypt from "bcryptjs";
 
-const connectionString = process.env.DIRECT_URL || process.env.DATABASE_URL;
-console.log("Connection string:", connectionString?.substring(0, 50) + "...");
-
-if (!connectionString) {
-  throw new Error("DATABASE_URL is not set");
-}
-
-const pool = new Pool({ connectionString });
-const adapter = new PrismaPg(pool);
-const prisma = new PrismaClient({ adapter });
+const prisma = new PrismaClient();
 
 async function main() {
-  console.log("Seeding database...");
-
   // Create default admin
-  const hashedPassword = await bcrypt.hash("Admin123!", 10);
+  const adminEmail = "admin@abushala.ly";
+  const adminPassword = "admin1234";
 
-  const admin = await prisma.user.upsert({
-    where: { email: "Admin@gmail.com" },
-    update: {},
-    create: {
-      email: "Admin@gmail.com",
-      name: "المدير العام",
-      password: hashedPassword,
-      role: "ADMIN",
-      emailVerified: new Date(),
-    },
+  const existingAdmin = await prisma.user.findUnique({
+    where: { email: adminEmail },
   });
 
-  console.log("Created admin:", admin.email);
-
-  // Create default currencies
-  const currencies = [
-    { name: "دولار أمريكي", code: "USD", buyPrice: 4.85, sellPrice: 4.9 },
-    { name: "يورو", code: "EUR", buyPrice: 5.2, sellPrice: 5.25 },
-    { name: "جنيه سوداني", code: "SDG", buyPrice: 0.008, sellPrice: 0.009 },
-    { name: "جنيه مصري", code: "EGP", buyPrice: 0.1, sellPrice: 0.11 },
-    { name: "ريال سعودي", code: "SAR", buyPrice: 1.29, sellPrice: 1.31 },
-    { name: "درهم إماراتي", code: "AED", buyPrice: 1.32, sellPrice: 1.34 },
-    { name: "دينار تونسي", code: "TND", buyPrice: 1.55, sellPrice: 1.58 },
-  ];
-
-  for (const currency of currencies) {
-    await prisma.currency.upsert({
-      where: { code: currency.code },
-      update: {
-        buyPrice: currency.buyPrice,
-        sellPrice: currency.sellPrice,
-      },
-      create: {
-        ...currency,
-        change: 0,
+  if (!existingAdmin) {
+    const hashedPassword = await bcrypt.hash(adminPassword, 10);
+    await prisma.user.create({
+      data: {
+        name: "المدير العام",
+        email: adminEmail,
+        password: hashedPassword,
+        role: "ADMIN",
       },
     });
-    console.log("Created/updated currency:", currency.code);
+    console.log("✅ Admin created: admin@abushala.ly / admin1234");
+  } else {
+    console.log("ℹ️ Admin already exists");
   }
 
-  console.log("Seeding completed!");
+  // Create default currencies
+  const currencyCount = await prisma.currency.count();
+
+  if (currencyCount === 0) {
+    await prisma.currency.createMany({
+      data: [
+        { name: "دولار أمريكي", code: "USD", buyPrice: 4.85, sellPrice: 4.9, change: 0 },
+        { name: "يورو", code: "EUR", buyPrice: 5.2, sellPrice: 5.25, change: 0 },
+        { name: "جنيه سوداني", code: "SDG", buyPrice: 0.008, sellPrice: 0.009, change: 0 },
+        { name: "جنيه مصري", code: "EGP", buyPrice: 0.1, sellPrice: 0.11, change: 0 },
+        { name: "ريال سعودي", code: "SAR", buyPrice: 1.29, sellPrice: 1.31, change: 0 },
+        { name: "درهم إماراتي", code: "AED", buyPrice: 1.32, sellPrice: 1.34, change: 0 },
+        { name: "دينار تونسي", code: "TND", buyPrice: 1.55, sellPrice: 1.58, change: 0 },
+      ],
+    });
+    console.log("✅ Default currencies created");
+  } else {
+    console.log("ℹ️ Currencies already exist");
+  }
 }
 
 main()
@@ -73,5 +55,4 @@ main()
   })
   .finally(async () => {
     await prisma.$disconnect();
-    await pool.end();
   });
