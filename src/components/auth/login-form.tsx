@@ -51,13 +51,15 @@ export const LoginForm = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-amber-50 to-orange-100">
-      <Card className="w-full max-w-md shadow-xl">
+    <div className="min-h-screen flex items-center justify-center p-4 gradient-hero">
+      <Card className="w-full max-w-md shadow-large">
         <CardHeader className="space-y-1 text-center">
           <div className="mx-auto mb-4 flex items-center justify-center">
-            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg">
-              <span className="text-white font-bold text-3xl">ش</span>
-            </div>
+            <img
+              src="/loginlogo.png"
+              alt="Login Logo"
+              className="w-24 h-24 object-contain"
+            />
           </div>
           <CardTitle className="text-2xl font-bold">تسجيل الدخول</CardTitle>
           <CardDescription>
@@ -110,7 +112,7 @@ export const LoginForm = () => {
               <div className="text-left">
                 <Link
                   href="/reset"
-                  className="text-sm text-amber-600 hover:underline"
+                  className="text-sm text-accent hover:underline"
                 >
                   نسيت كلمة المرور؟
                 </Link>
@@ -130,7 +132,7 @@ export const LoginForm = () => {
             <CardFooter className="flex flex-col gap-4">
               <Button
                 type="submit"
-                className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600"
+                className="w-full gradient-primary hover:opacity-90"
                 disabled={isPending}
               >
                 {isPending ? (
@@ -144,7 +146,7 @@ export const LoginForm = () => {
               </Button>
               <p className="text-sm text-center text-muted-foreground">
                 ليس لديك حساب؟{" "}
-                <Link href="/register" className="text-amber-600 hover:underline font-medium">
+                <Link href="/register" className="text-accent hover:underline font-medium">
                   إنشاء حساب جديد
                 </Link>
               </p>
