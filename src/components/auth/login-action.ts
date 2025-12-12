@@ -25,11 +25,17 @@ export const login = async (
     return { error: "البريد الإلكتروني غير مسجل!" };
   }
 
+  // Determine redirect based on user role
+  let redirectTo = callbackUrl || DEFAULT_LOGIN_REDIRECT;
+  if (!callbackUrl && existingUser.role === "ADMIN") {
+    redirectTo = "/admin";
+  }
+
   try {
     await signIn("credentials", {
       email,
       password,
-      redirectTo: callbackUrl || DEFAULT_LOGIN_REDIRECT,
+      redirectTo,
     });
   } catch (error) {
     if (error instanceof AuthError) {
