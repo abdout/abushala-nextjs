@@ -58,8 +58,12 @@ export const RegisterForm = () => {
     <div className="min-h-screen flex items-center justify-center p-4 gradient-hero">
       <Card className="w-full max-w-md shadow-large">
         <CardHeader className="space-y-1 text-center">
-          <div className="w-16 h-16 mx-auto rounded-full gradient-primary flex items-center justify-center mb-4 shadow-gold">
-            <span className="text-accent font-bold text-2xl">ش</span>
+          <div className="mx-auto mb-4 flex items-center justify-center">
+            <img
+              src="/loginlogo.png"
+              alt="أبو شعالة"
+              className="w-24 h-24 object-contain"
+            />
           </div>
           <CardTitle className="text-2xl font-bold">إنشاء حساب جديد</CardTitle>
           <CardDescription>

@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import WhatsAppButton from "@/components/WhatsAppButton";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Mail, MapPin, Phone, Send } from "lucide-react";
 import { toast } from "sonner";
+import { sendContactEmail } from "./contact-action";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -22,16 +26,25 @@ export default function ContactPage() {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulate sending message
-    setTimeout(() => {
-      toast.success("تم إرسال رسالتك بنجاح! سنتواصل معك قريباً");
-      setFormData({ name: "", email: "", phone: "", message: "" });
+    try {
+      const result = await sendContactEmail(formData);
+      if (result.success) {
+        toast.success("تم إرسال رسالتك بنجاح! سنتواصل معك قريباً");
+        setFormData({ name: "", email: "", phone: "", message: "" });
+      } else {
+        toast.error(result.error || "فشل في إرسال الرسالة");
+      }
+    } catch {
+      toast.error("حدث خطأ أثناء إرسال الرسالة");
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   return (
-    <>
+    <div className="min-h-screen flex flex-col">
+      <Navbar />
+
       {/* Hero Section */}
       <section className="gradient-primary text-primary-foreground py-16">
         <div className="container mx-auto px-4 text-center">
@@ -129,7 +142,7 @@ export default function ContactPage() {
                     <div>
                       <h3 className="font-bold text-lg mb-1">العنوان</h3>
                       <p className="text-muted-foreground">
-                        شارع طرابلس، وسط البلد
+                        دوار رابعة العدوية بجانب مقهى العماد
                         <br />
                         مصراتة، ليبيا
                       </p>
@@ -143,9 +156,7 @@ export default function ContactPage() {
                     <div>
                       <h3 className="font-bold text-lg mb-1">الهاتف</h3>
                       <p className="text-muted-foreground" dir="ltr">
-                        +218 91 234 5678
-                        <br />
-                        +218 92 345 6789
+                        0918239656
                       </p>
                     </div>
                   </div>
@@ -157,9 +168,7 @@ export default function ContactPage() {
                     <div>
                       <h3 className="font-bold text-lg mb-1">البريد الإلكتروني</h3>
                       <p className="text-muted-foreground" dir="ltr">
-                        info@abushaalah.ly
-                        <br />
-                        support@abushaalah.ly
+                        Abushaala01@gmail.com
                       </p>
                     </div>
                   </div>
@@ -172,12 +181,8 @@ export default function ContactPage() {
                 <h3 className="text-xl font-bold mb-4 text-primary">ساعات العمل</h3>
                 <div className="space-y-3">
                   <div className="flex justify-between">
-                    <span className="font-medium">السبت - الخميس:</span>
-                    <span className="text-muted-foreground">8:00 ص - 8:00 م</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="font-medium">الجمعة:</span>
-                    <span className="text-muted-foreground">2:00 م - 8:00 م</span>
+                    <span className="font-medium">كل أيام الأسبوع:</span>
+                    <span className="text-muted-foreground">9:00 ص - 9:00 م</span>
                   </div>
                 </div>
               </CardContent>
@@ -204,6 +209,9 @@ export default function ContactPage() {
           </div>
         </div>
       </main>
-    </>
+
+      <Footer />
+      <WhatsAppButton />
+    </div>
   );
 }
