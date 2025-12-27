@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { LogOut, Menu, X } from "lucide-react";
+import { LogOut, Menu, X, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useSession, signOut } from "next-auth/react";
 
@@ -12,6 +12,7 @@ const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { data: session, status } = useSession();
 
+  const isLoading = status === "loading";
   const isAdmin = session?.user?.role === "ADMIN";
   const isLoggedIn = status === "authenticated";
 
@@ -58,7 +59,11 @@ const Navbar = () => {
                 {link.label}
               </Link>
             ))}
-            {isLoggedIn && (
+            {isLoading ? (
+              <Button variant="outline" size="sm" disabled className="gap-2">
+                <Loader2 className="w-4 h-4 animate-spin" />
+              </Button>
+            ) : isLoggedIn ? (
               <Button
                 onClick={handleLogout}
                 variant="outline"
@@ -68,7 +73,7 @@ const Navbar = () => {
                 <LogOut className="w-4 h-4" />
                 تسجيل خروج
               </Button>
-            )}
+            ) : null}
           </div>
 
           {/* Mobile Menu Button */}
@@ -102,7 +107,11 @@ const Navbar = () => {
                   {link.label}
                 </Link>
               ))}
-              {isLoggedIn && (
+              {isLoading ? (
+                <Button variant="outline" size="sm" disabled className="gap-2 w-full">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                </Button>
+              ) : isLoggedIn ? (
                 <Button
                   onClick={() => {
                     handleLogout();
@@ -115,7 +124,7 @@ const Navbar = () => {
                   <LogOut className="w-4 h-4" />
                   تسجيل خروج
                 </Button>
-              )}
+              ) : null}
             </div>
           </div>
         )}

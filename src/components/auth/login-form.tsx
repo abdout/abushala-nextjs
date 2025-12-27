@@ -46,7 +46,9 @@ export const LoginForm = () => {
             setError(data.error);
           }
         })
-        .catch(() => setError("حدث خطأ ما!"));
+        .catch(() => {
+          // Redirect throws an error - this is expected, ignore it
+        });
     });
   };
 
