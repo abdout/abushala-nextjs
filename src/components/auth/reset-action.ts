@@ -21,8 +21,8 @@ export const resetPassword = async (email: string, password: string) => {
     return { error: "لا يوجد حساب مرتبط بهذا البريد" };
   }
 
-  if (password.length < 6) {
-    return { error: "كلمة المرور يجب أن تكون 6 أحرف على الأقل" };
+  if (password.length < 4) {
+    return { error: "كلمة المرور يجب أن تكون 4 أحرف على الأقل" };
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);

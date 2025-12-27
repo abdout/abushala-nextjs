@@ -7,24 +7,24 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { ArrowRight, Mail } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { checkEmailExists, resetPassword } from "./reset-action";
 
 const STEP_COPY = {
   request: {
     title: "نسيت كلمة المرور؟",
     description: "أدخل بريدك الإلكتروني لاستعادة كلمة المرور",
-    button: "إرسال رابط الاستعادة",
+    button: "التالي",
   },
   reset: {
     title: "إعادة تعيين كلمة المرور",
-    description: "أدخل كلمة مرور جديدة لتأمين حسابك",
-    button: "حفظ كلمة المرور الجديدة",
+    description: "أدخل كلمة مرور جديدة",
+    button: "حفظ كلمة المرور",
   },
   success: {
     title: "تم تحديث كلمة المرور",
     description: "يمكنك الآن تسجيل الدخول بكلمة المرور الجديدة",
-    button: "العودة لتسجيل الدخول",
+    button: "تسجيل الدخول",
   },
 } as const;
 
@@ -62,8 +62,8 @@ export const ResetForm = () => {
       return;
     }
 
-    if (password.length < 6) {
-      toast.error("كلمة المرور يجب أن تكون 6 أحرف على الأقل");
+    if (password.length < 4) {
+      toast.error("كلمة المرور يجب أن تكون 4 أحرف على الأقل");
       return;
     }
 
@@ -90,8 +90,12 @@ export const ResetForm = () => {
     <div className="min-h-screen flex items-center justify-center p-4 gradient-hero">
       <Card className="w-full max-w-md shadow-large">
         <CardHeader className="space-y-1 text-center">
-          <div className="w-16 h-16 mx-auto rounded-full gradient-primary flex items-center justify-center mb-4 shadow-gold">
-            <Mail className="w-8 h-8 text-accent" />
+          <div className="mx-auto mb-4 flex items-center justify-center">
+            <img
+              src="/loginlogo.png"
+              alt="أبو شعالة"
+              className="w-24 h-24 object-contain"
+            />
           </div>
           <CardTitle className="text-2xl font-bold">{title}</CardTitle>
           <CardDescription>{description}</CardDescription>
