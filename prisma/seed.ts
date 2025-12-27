@@ -5,8 +5,8 @@ const prisma = new PrismaClient();
 
 async function main() {
   // Create default admin
-  const adminEmail = "admin@abushala.ly";
-  const adminPassword = "admin1234";
+  const adminEmail = "admin@gmail.com";
+  const adminPassword = "admin123";
 
   const existingAdmin = await prisma.user.findUnique({
     where: { email: adminEmail },
@@ -22,7 +22,7 @@ async function main() {
         role: "ADMIN",
       },
     });
-    console.log("✅ Admin created: admin@abushala.ly / admin1234");
+    console.log("✅ Admin created: admin@gmail.com / admin123");
   } else {
     console.log("ℹ️ Admin already exists");
   }

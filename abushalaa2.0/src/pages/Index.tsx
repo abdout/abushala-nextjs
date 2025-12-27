@@ -98,7 +98,7 @@ const Index = () => {
                 className="gap-2"
               >
                 <a
-                  href="https://www.facebook.com/profile.php?id=100063558764305"
+                  href="https://www.facebook.com/Bouchaalasudan"
                   target="_blank"
                   rel="noreferrer"
                 >
