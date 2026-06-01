@@ -377,7 +377,7 @@ export function AdminDashboard({ currentUser, initialCurrencies, initialUsers }:
             </div>
           </CardHeader>
           <CardContent className="overflow-x-auto">
-            <Table>
+            <Table className="min-w-[760px]">
               <TableHeader>
                 <TableRow>
                   <TableHead>العملة</TableHead>
@@ -524,7 +524,7 @@ export function AdminDashboard({ currentUser, initialCurrencies, initialUsers }:
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="overflow-x-auto">
-              <Table>
+              <Table className="min-w-[640px]">
                 <TableHeader>
                   <TableRow>
                     <TableHead>الاسم</TableHead>
@@ -627,7 +627,7 @@ export function AdminDashboard({ currentUser, initialCurrencies, initialUsers }:
             <CardDescription>جميع الحسابات التي تم إنشاؤها من نموذج التسجيل</CardDescription>
           </CardHeader>
           <CardContent className="overflow-x-auto">
-            <Table>
+            <Table className="min-w-[640px]">
               <TableHeader>
                 <TableRow>
                   <TableHead>الاسم</TableHead>

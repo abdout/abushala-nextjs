@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
 import { auth } from "@/auth";
 import { revalidatePath } from "next/cache";
-import { UserRole } from "@prisma/client";
+import type { UserRole } from "@/generated/prisma/client";
 
 // Check if current user is admin
 async function checkAdminAuth() {

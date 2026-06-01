@@ -62,8 +62,8 @@ export const ResetForm = () => {
       return;
     }
 
-    if (password.length < 4) {
-      toast.error("كلمة المرور يجب أن تكون 4 أحرف على الأقل");
+    if (password.length < 6) {
+      toast.error("كلمة المرور يجب أن تكون 6 أحرف على الأقل");
       return;
     }
 

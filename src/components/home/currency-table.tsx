@@ -21,6 +21,31 @@ interface CurrencyTableProps {
   currencies: Currency[];
 }
 
+const formatUpdatedAt = (value: Date | string) =>
+  new Date(value).toLocaleString("ar-LY", {
+    hour: "2-digit",
+    minute: "2-digit",
+    day: "2-digit",
+    month: "2-digit",
+  });
+
+function ChangeIndicator({ change }: { change: number }) {
+  if (change === 0) {
+    return <span className="text-muted-foreground">-</span>;
+  }
+  const isUp = change > 0;
+  const Icon = isUp ? TrendingUp : TrendingDown;
+  return (
+    <div className={`flex items-center justify-center gap-1 ${isUp ? "text-green-600" : "text-red-600"}`}>
+      <Icon className="w-4 h-4" />
+      <span className="text-sm font-medium">
+        {isUp ? "+" : ""}
+        {change.toFixed(2)}
+      </span>
+    </div>
+  );
+}
+
 export function CurrencyTable({ currencies }: CurrencyTableProps) {
   const lastUpdatedLabel = useMemo(() => {
     if (!currencies.length) {
@@ -33,88 +58,100 @@ export function CurrencyTable({ currencies }: CurrencyTableProps) {
       currencies[0]
     );
 
-    return new Date(latest.updatedAt).toLocaleString("ar-LY", {
-      hour: "2-digit",
-      minute: "2-digit",
-      day: "2-digit",
-      month: "2-digit",
-    });
+    return formatUpdatedAt(latest.updatedAt);
   }, [currencies]);
 
   return (
     <Card className="shadow-medium">
       <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-xl font-bold">أسعار العملات</CardTitle>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <CardTitle className="text-lg sm:text-xl font-bold">أسعار العملات</CardTitle>
           <Badge variant="outline" className="text-xs">
             آخر تحديث: {lastUpdatedLabel}
           </Badge>
         </div>
       </CardHeader>
       <CardContent>
-        <div className="rounded-lg border border-border overflow-hidden">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-muted/50">
-                <TableHead className="text-right font-bold">العملة</TableHead>
-                <TableHead className="text-center font-bold">الرمز</TableHead>
-                <TableHead className="text-center font-bold">سعر الشراء</TableHead>
-                <TableHead className="text-center font-bold">سعر البيع</TableHead>
-                <TableHead className="text-center font-bold">آخر تحديث</TableHead>
-                <TableHead className="text-center font-bold">التغيير</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {currencies.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
-                    لا توجد عملات مضافة حاليًا. يرجى إضافة بيانات من لوحة التحكم.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                currencies.map((currency) => (
-                  <TableRow key={currency.id} className="hover:bg-muted/30 transition-smooth">
-                    <TableCell className="font-medium">{currency.name}</TableCell>
-                    <TableCell className="text-center">
-                      <Badge variant="secondary" className="font-mono">
-                        {currency.code}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-center font-semibold text-primary">
-                      {currency.buyPrice.toFixed(2)} د.ل
-                    </TableCell>
-                    <TableCell className="text-center font-semibold text-primary">
-                      {currency.sellPrice.toFixed(2)} د.ل
-                    </TableCell>
-                    <TableCell className="text-center text-sm text-muted-foreground">
-                      {currency.updatedAt ? new Date(currency.updatedAt).toLocaleString("ar-LY", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                        day: "2-digit",
-                        month: "2-digit",
-                      }) : "-"}
-                    </TableCell>
-                    <TableCell className="text-center">
-                      {currency.change === 0 ? (
-                        <span className="text-muted-foreground">-</span>
-                      ) : currency.change > 0 ? (
-                        <div className="flex items-center justify-center gap-1 text-green-600">
-                          <TrendingUp className="w-4 h-4" />
-                          <span className="text-sm font-medium">+{currency.change.toFixed(2)}</span>
-                        </div>
-                      ) : (
-                        <div className="flex items-center justify-center gap-1 text-red-600">
-                          <TrendingDown className="w-4 h-4" />
-                          <span className="text-sm font-medium">{currency.change.toFixed(2)}</span>
-                        </div>
-                      )}
-                    </TableCell>
+        {currencies.length === 0 ? (
+          <div className="rounded-lg border border-border py-8 text-center text-muted-foreground">
+            لا توجد عملات مضافة حاليًا. يرجى إضافة بيانات من لوحة التحكم.
+          </div>
+        ) : (
+          <>
+            {/* Mobile: stacked cards (below sm) */}
+            <div className="space-y-3 sm:hidden">
+              {currencies.map((currency) => (
+                <div
+                  key={currency.id}
+                  className="rounded-lg border border-border p-4 space-y-3"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-semibold">{currency.name}</span>
+                    <Badge variant="secondary" className="font-mono">
+                      {currency.code}
+                    </Badge>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 text-center">
+                    <div className="rounded-md bg-muted/40 py-2">
+                      <p className="text-xs text-muted-foreground mb-1">سعر الشراء</p>
+                      <p className="font-semibold text-primary">{currency.buyPrice.toFixed(2)} د.ل</p>
+                    </div>
+                    <div className="rounded-md bg-muted/40 py-2">
+                      <p className="text-xs text-muted-foreground mb-1">سعر البيع</p>
+                      <p className="font-semibold text-primary">{currency.sellPrice.toFixed(2)} د.ل</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">
+                      {currency.updatedAt ? formatUpdatedAt(currency.updatedAt) : "-"}
+                    </span>
+                    <ChangeIndicator change={currency.change} />
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop: table (sm and up), horizontally scrollable as a fallback */}
+            <div className="hidden sm:block rounded-lg border border-border overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-muted/50">
+                    <TableHead className="text-right font-bold">العملة</TableHead>
+                    <TableHead className="text-center font-bold">الرمز</TableHead>
+                    <TableHead className="text-center font-bold">سعر الشراء</TableHead>
+                    <TableHead className="text-center font-bold">سعر البيع</TableHead>
+                    <TableHead className="text-center font-bold">آخر تحديث</TableHead>
+                    <TableHead className="text-center font-bold">التغيير</TableHead>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </div>
+                </TableHeader>
+                <TableBody>
+                  {currencies.map((currency) => (
+                    <TableRow key={currency.id} className="hover:bg-muted/30 transition-smooth">
+                      <TableCell className="font-medium">{currency.name}</TableCell>
+                      <TableCell className="text-center">
+                        <Badge variant="secondary" className="font-mono">
+                          {currency.code}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-center font-semibold text-primary">
+                        {currency.buyPrice.toFixed(2)} د.ل
+                      </TableCell>
+                      <TableCell className="text-center font-semibold text-primary">
+                        {currency.sellPrice.toFixed(2)} د.ل
+                      </TableCell>
+                      <TableCell className="text-center text-sm text-muted-foreground">
+                        {currency.updatedAt ? formatUpdatedAt(currency.updatedAt) : "-"}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <ChangeIndicator change={currency.change} />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </>
+        )}
         <div className="mt-4 p-3 bg-muted/30 rounded-lg">
           <p className="text-sm text-muted-foreground text-center">
             الأسعار المعروضة استرشادية وقابلة للتغيير في أي وقت. للحصول على السعر الفعلي يرجى التواصل مع المكتب مباشرة.

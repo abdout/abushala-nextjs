@@ -6,7 +6,7 @@ import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
 import { getUserById, getUserByEmail } from "@/components/auth/user";
 import { getAccountByUserId } from "@/components/auth/account";
-import { UserRole } from "@prisma/client";
+import type { UserRole } from "@/generated/prisma/client";
 import { LoginSchema } from "@/components/auth/validation";
 
 export const {
@@ -75,11 +75,18 @@ export const {
   },
   adapter: PrismaAdapter(db),
   session: { strategy: "jwt" },
+  trustHost: true,
   providers: [
-    Google({
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    }),
+    // Only register Google when its credentials are configured — avoids
+    // provider-init failures in environments where Google OAuth is unused.
+    ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
+      ? [
+          Google({
+            clientId: process.env.GOOGLE_CLIENT_ID,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+          }),
+        ]
+      : []),
     Credentials({
       async authorize(credentials) {
         const validatedFields = LoginSchema.safeParse(credentials);

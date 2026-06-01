@@ -1,31 +1,31 @@
-import { PrismaClient } from "@prisma/client";
+import "dotenv/config";
+import { PrismaClient } from "../src/generated/prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 import bcrypt from "bcryptjs";
 
-const prisma = new PrismaClient();
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  // Create default admin
+  // Create or update default admin (idempotent — safe to re-run against prod)
   const adminEmail = "admin@abushala.ly";
-  const adminPassword = "1234";
+  const adminPassword = "123456";
+  const hashedPassword = await bcrypt.hash(adminPassword, 10);
 
-  const existingAdmin = await prisma.user.findUnique({
+  await prisma.user.upsert({
     where: { email: adminEmail },
+    update: {
+      password: hashedPassword,
+      role: "ADMIN",
+    },
+    create: {
+      name: "المدير العام",
+      email: adminEmail,
+      password: hashedPassword,
+      role: "ADMIN",
+    },
   });
-
-  if (!existingAdmin) {
-    const hashedPassword = await bcrypt.hash(adminPassword, 10);
-    await prisma.user.create({
-      data: {
-        name: "المدير العام",
-        email: adminEmail,
-        password: hashedPassword,
-        role: "ADMIN",
-      },
-    });
-    console.log("✅ Admin created: admin@abushala.ly / 1234");
-  } else {
-    console.log("ℹ️ Admin already exists");
-  }
+  console.log("✅ Admin ready: admin@abushala.ly / 123456");
 
   // Create default currencies
   const currencyCount = await prisma.currency.count();
