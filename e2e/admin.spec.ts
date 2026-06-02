@@ -1,7 +1,32 @@
 import { test, expect } from "@playwright/test";
 import { loginAsAdmin } from "./helpers";
+import { snapshotUSD, restoreUSD, disconnectDb } from "./db";
 
 test.describe("admin auth & pricing (production)", () => {
+  // Safety net: snapshot the currency the pricing test mutates and restore it
+  // exactly afterwards, regardless of any UI flakiness on the live site.
+  let usdSnapshot: { buyPrice: number; sellPrice: number; change: number } | null = null;
+
+  test.beforeAll(async () => {
+    try {
+      const usd = await snapshotUSD();
+      if (usd) usdSnapshot = { buyPrice: usd.buyPrice, sellPrice: usd.sellPrice, change: usd.change };
+    } catch (e) {
+      console.warn("[safety-net] snapshot failed:", (e as Error).message);
+    }
+  });
+
+  test.afterAll(async () => {
+    try {
+      if (usdSnapshot) {
+        await restoreUSD(usdSnapshot.buyPrice, usdSnapshot.sellPrice, usdSnapshot.change);
+      }
+      await disconnectDb();
+    } catch (e) {
+      console.warn("[safety-net] restore failed:", (e as Error).message);
+    }
+  });
+
   test("password reset page is reachable", async ({ page }) => {
     // Public auth route — do NOT submit (would change a real password).
     await page.goto("/reset", { waitUntil: "domcontentloaded" });
@@ -20,56 +45,38 @@ test.describe("admin auth & pricing (production)", () => {
     await expect(page).toHaveURL(/\/login/);
   });
 
-  test("admin edits a currency price; it persists, reflects publicly, and is restored", async ({
-    page,
-  }) => {
+  test("admin edits a currency price; it persists and reflects publicly", async ({ page }) => {
     await loginAsAdmin(page);
 
-    // First row's sell price (2nd numeric input in the row). Editing sellPrice
-    // keeps the computed `change` at 0 — no misleading indicator on the live site.
-    const firstRow = page.locator("table tbody tr").first();
-    const sellInput = firstRow.locator("input[type='number']").nth(1);
+    // First row's sell price (2nd numeric input). Editing sellPrice keeps the
+    // computed `change` at 0 — no misleading indicator on the live site.
+    const sellInput = page.locator("table tbody tr").first().locator("input[type='number']").nth(1);
     await sellInput.waitFor({ timeout: 30_000 });
 
     const original = await sellInput.inputValue();
     const newVal = (parseFloat(original) + 0.01).toFixed(2);
-    let mutated = false;
 
-    try {
-      await sellInput.fill(newVal);
-      await page.getByRole("button", { name: /حفظ الكل/ }).click();
-      mutated = true;
-      // Toast is best-effort (auto-dismisses); persistence reload is the real proof.
-      await expect
-        .soft(page.getByText("تم حفظ أسعار العملات بنجاح"))
-        .toBeVisible();
+    await sellInput.fill(newVal);
+    await page.getByRole("button", { name: /حفظ الكل/ }).click();
+    await expect(page.getByText("تم حفظ أسعار العملات بنجاح")).toBeVisible();
 
-      // Persistence: reload /admin and confirm the new value stuck in the DB.
-      await page.reload({ waitUntil: "domcontentloaded" });
-      await expect(
-        page.locator("table tbody tr").first().locator("input[type='number']").nth(1)
-      ).toHaveValue(newVal);
+    // Persists on /admin reload (re-fetched from the DB).
+    await page.reload({ waitUntil: "domcontentloaded" });
+    await expect(
+      page.locator("table tbody tr").first().locator("input[type='number']").nth(1)
+    ).toHaveValue(newVal);
 
-      // Reflects on the public page.
-      await page.goto("/", { waitUntil: "domcontentloaded" });
-      await expect(page.getByText(`${newVal} د.ل`).first()).toBeVisible();
-    } finally {
-      // Always restore so production data is left unchanged.
-      if (mutated) {
-        await page.goto("/admin", { waitUntil: "domcontentloaded" });
-        const restore = page
-          .locator("table tbody tr")
-          .first()
-          .locator("input[type='number']")
-          .nth(1);
-        await restore.waitFor({ timeout: 30_000 });
-        await restore.fill(original);
-        await page.getByRole("button", { name: /حفظ الكل/ }).click();
-        await page.reload({ waitUntil: "domcontentloaded" });
-        await expect(
-          page.locator("table tbody tr").first().locator("input[type='number']").nth(1)
-        ).toHaveValue(original);
-      }
-    }
+    // Reflects on the public page. Scope to the visible desktop <table> — the
+    // mobile cards carry the same text but are hidden at this viewport.
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    await expect(page.locator("table").getByText(`${newVal} د.ل`).first()).toBeVisible();
+
+    // Restore via the UI as well (afterAll guarantees the DB is clean regardless).
+    await page.goto("/admin", { waitUntil: "domcontentloaded" });
+    const restore = page.locator("table tbody tr").first().locator("input[type='number']").nth(1);
+    await restore.waitFor({ timeout: 30_000 });
+    await restore.fill(original);
+    await page.getByRole("button", { name: /حفظ الكل/ }).click();
+    await expect(page.getByText("تم حفظ أسعار العملات بنجاح")).toBeVisible();
   });
 });
