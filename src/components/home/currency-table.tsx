@@ -27,6 +27,10 @@ const formatUpdatedAt = (value: Date | string) =>
     minute: "2-digit",
     day: "2-digit",
     month: "2-digit",
+    // Pin the timezone so SSR (server TZ) and the client (browser TZ) render
+    // identical text — otherwise React throws a hydration mismatch (#418)
+    // which can swallow the first click on nav links.
+    timeZone: "Africa/Tripoli",
   });
 
 function ChangeIndicator({ change }: { change: number }) {

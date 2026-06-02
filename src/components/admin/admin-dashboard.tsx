@@ -60,6 +60,7 @@ const formatDate = (value?: Date | string) => {
     minute: "2-digit",
     day: "2-digit",
     month: "short",
+    timeZone: "Africa/Tripoli",
   });
 };
 

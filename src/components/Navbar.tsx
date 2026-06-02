@@ -24,7 +24,7 @@ const Navbar = ({ user }: { user?: NavbarUser | null }) => {
   const isAdmin = user?.role === "ADMIN";
 
   const handleLogout = async () => {
-    await signOut({ callbackUrl: "/login" });
+    await signOut({ callbackUrl: "/" });
   };
 
   const navLinks = [

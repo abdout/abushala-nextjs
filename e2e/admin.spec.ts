@@ -44,11 +44,16 @@ test.describe("admin auth & pricing (production)", () => {
     await expect(page.getByRole("heading", { name: "لوحة التحكم" })).toBeVisible();
   });
 
-  test("logout button works and returns to /login", async ({ page }) => {
+  test("logout button works and returns to the public home page", async ({ page }) => {
     await loginAsAdmin(page);
     await page.getByRole("button", { name: /تسجيل خروج/ }).click();
-    await page.waitForURL(/\/login/, { timeout: 45_000, waitUntil: "commit" });
-    await expect(page).toHaveURL(/\/login/);
+    await page.waitForURL((url) => new URL(url).pathname === "/", {
+      timeout: 45_000,
+      waitUntil: "commit",
+    });
+    await expect(page).not.toHaveURL(/\/(login|admin)/);
+    // Logged-out navbar shows the login button.
+    await expect(page.getByRole("link", { name: /تسجيل الدخول/ }).first()).toBeVisible();
   });
 
   test("admin edits a currency price; it persists and reflects publicly", async ({ page }) => {
