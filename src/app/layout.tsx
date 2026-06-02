@@ -3,7 +3,6 @@ import { Cairo } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { Providers } from "@/components/Providers";
-import { auth } from "@/auth";
 
 const cairo = Cairo({
   subsets: ["arabic", "latin"],
@@ -18,17 +17,15 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await auth();
-
   return (
     <html lang="ar" dir="rtl">
       <body className={`${cairo.variable} font-sans antialiased`}>
-        <Providers session={session}>
+        <Providers>
           {children}
         </Providers>
         <Toaster position="top-center" />

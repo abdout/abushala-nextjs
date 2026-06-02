@@ -3,18 +3,25 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { LogOut, Menu, X, Loader2 } from "lucide-react";
+import { LogOut, Menu, X } from "lucide-react";
 import { useState } from "react";
-import { useSession, signOut } from "next-auth/react";
+import { signOut } from "next-auth/react";
 
-const Navbar = () => {
+export interface NavbarUser {
+  name?: string | null;
+  email?: string | null;
+  role?: string | null;
+}
+
+const Navbar = ({ user }: { user?: NavbarUser | null }) => {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { data: session, status } = useSession();
 
-  const isLoading = status === "loading";
-  const isAdmin = session?.user?.role === "ADMIN";
-  const isLoggedIn = status === "authenticated";
+  // Auth state comes from the server (passed as a prop) rather than
+  // useSession() — the client hook does not reliably reflect the session
+  // after a soft navigation in this Next.js + Auth.js setup.
+  const isLoggedIn = !!user;
+  const isAdmin = user?.role === "ADMIN";
 
   const handleLogout = async () => {
     await signOut({ callbackUrl: "/login" });
@@ -59,11 +66,7 @@ const Navbar = () => {
                 {link.label}
               </Link>
             ))}
-            {isLoading ? (
-              <Button variant="outline" size="sm" disabled className="gap-2">
-                <Loader2 className="w-4 h-4 animate-spin" />
-              </Button>
-            ) : isLoggedIn ? (
+            {isLoggedIn ? (
               <Button
                 onClick={handleLogout}
                 variant="outline"
@@ -80,6 +83,7 @@ const Navbar = () => {
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="md:hidden p-2 rounded-lg hover:bg-muted transition-smooth"
+            aria-label="القائمة"
           >
             {mobileMenuOpen ? (
               <X className="w-6 h-6" />
@@ -107,11 +111,7 @@ const Navbar = () => {
                   {link.label}
                 </Link>
               ))}
-              {isLoading ? (
-                <Button variant="outline" size="sm" disabled className="gap-2 w-full">
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                </Button>
-              ) : isLoggedIn ? (
+              {isLoggedIn ? (
                 <Button
                   onClick={() => {
                     handleLogout();

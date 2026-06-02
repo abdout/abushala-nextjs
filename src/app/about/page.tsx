@@ -1,12 +1,12 @@
-"use client";
-
+import { auth } from "@/auth";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { Card, CardContent } from "@/components/ui/card";
 import { Award, Clock, Shield, Users } from "lucide-react";
 
-const About = () => {
+const About = async () => {
+    const session = await auth();
     const features = [
         {
             icon: Shield,
@@ -32,7 +32,7 @@ const About = () => {
 
     return (
         <div className="min-h-screen flex flex-col">
-            <Navbar />
+            <Navbar user={session?.user} />
 
             {/* Hero Section */}
             <section className="gradient-primary text-primary-foreground py-16">

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Navbar from "@/components/Navbar";
+import Navbar, { type NavbarUser } from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { CurrencyTable } from "@/components/home/currency-table";
@@ -23,9 +23,10 @@ interface Currency {
 
 interface HomePageProps {
   currencies: Currency[];
+  user?: NavbarUser | null;
 }
 
-export function HomePage({ currencies }: HomePageProps) {
+export function HomePage({ currencies, user }: HomePageProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const handleRefresh = () => {
@@ -36,7 +37,7 @@ export function HomePage({ currencies }: HomePageProps) {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar />
+      <Navbar user={user} />
 
       {/* Hero Section */}
       <section className="gradient-hero text-primary-foreground py-16">

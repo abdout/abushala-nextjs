@@ -12,7 +12,7 @@ const Index = async () => {
 
   const currencies = await getCurrencies();
 
-  return <HomePage currencies={currencies} />;
+  return <HomePage currencies={currencies} user={session.user} />;
 };
 
 export default Index;
