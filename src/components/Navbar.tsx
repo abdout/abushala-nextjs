@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { LogOut, Menu, X } from "lucide-react";
+import { LogIn, LogOut, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { signOut } from "next-auth/react";
 
@@ -76,7 +76,14 @@ const Navbar = ({ user }: { user?: NavbarUser | null }) => {
                 <LogOut className="w-4 h-4" />
                 تسجيل خروج
               </Button>
-            ) : null}
+            ) : (
+              <Button asChild variant="outline" size="sm" className="gap-2">
+                <Link href="/login">
+                  <LogIn className="w-4 h-4" />
+                  تسجيل الدخول
+                </Link>
+              </Button>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -124,7 +131,14 @@ const Navbar = ({ user }: { user?: NavbarUser | null }) => {
                   <LogOut className="w-4 h-4" />
                   تسجيل خروج
                 </Button>
-              ) : null}
+              ) : (
+                <Button asChild variant="outline" size="sm" className="gap-2 w-full">
+                  <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
+                    <LogIn className="w-4 h-4" />
+                    تسجيل الدخول
+                  </Link>
+                </Button>
+              )}
             </div>
           </div>
         )}

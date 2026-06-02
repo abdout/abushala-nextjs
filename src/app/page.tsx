@@ -1,18 +1,14 @@
 import { auth } from "@/auth";
-import { redirect } from "next/navigation";
 import { getCurrencies } from "@/components/admin/admin-actions";
 import { HomePage } from "@/components/home/home-page";
 
+// Public page — anyone can view the exchange rates. Admins additionally see
+// the dashboard link / logout button (resolved from the session below).
 const Index = async () => {
   const session = await auth();
-
-  if (!session?.user) {
-    redirect("/login");
-  }
-
   const currencies = await getCurrencies();
 
-  return <HomePage currencies={currencies} user={session.user} />;
+  return <HomePage currencies={currencies} user={session?.user} />;
 };
 
 export default Index;

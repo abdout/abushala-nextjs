@@ -27,6 +27,12 @@ test.describe("admin auth & pricing (production)", () => {
     }
   });
 
+  test("home page is public — exchange rates visible without login", async ({ page }) => {
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    await expect(page).not.toHaveURL(/\/login/);
+    await expect(page.getByText("أسعار العملات").first()).toBeVisible();
+  });
+
   test("password reset page is reachable", async ({ page }) => {
     // Public auth route — do NOT submit (would change a real password).
     await page.goto("/reset", { waitUntil: "domcontentloaded" });
