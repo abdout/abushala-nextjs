@@ -27,9 +27,14 @@ test.describe("admin auth & pricing (production)", () => {
     }
   });
 
-  test("home page is public — exchange rates visible without login", async ({ page }) => {
+  test("home is gated — guests are redirected to login", async ({ page }) => {
     await page.goto("/", { waitUntil: "domcontentloaded" });
-    await expect(page).not.toHaveURL(/\/login/);
+    await expect(page).toHaveURL(/\/login/);
+  });
+
+  test("exchange rates are visible after login", async ({ page }) => {
+    await loginAsAdmin(page);
+    await page.goto("/", { waitUntil: "domcontentloaded" });
     await expect(page.getByText("أسعار العملات").first()).toBeVisible();
   });
 
@@ -44,16 +49,13 @@ test.describe("admin auth & pricing (production)", () => {
     await expect(page.getByRole("heading", { name: "لوحة التحكم" })).toBeVisible();
   });
 
-  test("logout button works and returns to the public home page", async ({ page }) => {
+  test("logout button works and returns to the login page", async ({ page }) => {
     await loginAsAdmin(page);
     await page.getByRole("button", { name: /تسجيل خروج/ }).click();
-    await page.waitForURL((url) => new URL(url).pathname === "/", {
-      timeout: 45_000,
-      waitUntil: "commit",
-    });
-    await expect(page).not.toHaveURL(/\/(login|admin)/);
-    // Logged-out navbar shows the login button.
-    await expect(page.getByRole("link", { name: /تسجيل الدخول/ }).first()).toBeVisible();
+    // Home is gated, so logout lands on /login.
+    await page.waitForURL(/\/login/, { timeout: 45_000, waitUntil: "commit" });
+    await expect(page).toHaveURL(/\/login/);
+    await expect(page.getByText("تسجيل الدخول").first()).toBeVisible();
   });
 
   test("admin edits a currency price; it persists and reflects publicly", async ({ page }) => {

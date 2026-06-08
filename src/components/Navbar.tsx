@@ -24,13 +24,15 @@ const Navbar = ({ user }: { user?: NavbarUser | null }) => {
   const isAdmin = user?.role === "ADMIN";
 
   const handleLogout = async () => {
-    await signOut({ callbackUrl: "/" });
+    // Home is gated behind auth, so send logged-out users straight to /login.
+    await signOut({ callbackUrl: "/login" });
   };
 
   const navLinks = [
     { href: "/", label: "الرئيسية" },
     { href: "/about", label: "من نحن" },
     { href: "/contact", label: "تواصل معنا" },
+    ...(isLoggedIn ? [{ href: "/settings", label: "الإعدادات" }] : []),
     ...(isAdmin ? [{ href: "/admin", label: "لوحة التحكم" }] : []),
   ];
 

@@ -628,11 +628,12 @@ export function AdminDashboard({ currentUser, initialCurrencies, initialUsers }:
             <CardDescription>جميع الحسابات التي تم إنشاؤها من نموذج التسجيل</CardDescription>
           </CardHeader>
           <CardContent className="overflow-x-auto">
-            <Table className="min-w-[640px]">
+            <Table className="min-w-[480px]">
               <TableHeader>
+                {/* Email is intentionally hidden here for member privacy — only
+                    name and phone are shown (see review report item 3.1). */}
                 <TableRow>
                   <TableHead>الاسم</TableHead>
-                  <TableHead>البريد الإلكتروني</TableHead>
                   <TableHead>رقم الهاتف</TableHead>
                   <TableHead className="text-center">تاريخ الانضمام</TableHead>
                 </TableRow>
@@ -640,7 +641,7 @@ export function AdminDashboard({ currentUser, initialCurrencies, initialUsers }:
               <TableBody>
                 {users.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
+                    <TableCell colSpan={3} className="text-center text-muted-foreground py-8">
                       لا يوجد مستخدمون بعد. عند إنشاء حسابات جديدة ستظهر هنا.
                     </TableCell>
                   </TableRow>
@@ -648,9 +649,6 @@ export function AdminDashboard({ currentUser, initialCurrencies, initialUsers }:
                   users.map((user) => (
                     <TableRow key={user.id}>
                       <TableCell className="font-medium">{user.name ?? "-"}</TableCell>
-                      <TableCell className="text-sm" dir="ltr">
-                        {user.email}
-                      </TableCell>
                       <TableCell dir="ltr">{user.phone ?? "-"}</TableCell>
                       <TableCell className="text-center text-sm text-muted-foreground">
                         {formatDate(user.createdAt)}

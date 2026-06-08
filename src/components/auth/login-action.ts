@@ -5,7 +5,15 @@ import { AuthError } from "next-auth";
 import { signIn } from "@/auth";
 import { LoginSchema } from "@/components/auth/validation";
 import { getUserByEmail } from "@/components/auth/user";
+import { generateVerificationToken } from "@/lib/tokens";
+import { sendVerificationEmail } from "@/lib/mail";
 import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
+
+// Opt-in: only block unverified logins when explicitly enabled. This keeps
+// sign-up/login working in environments where Resend isn't configured yet.
+// Flip REQUIRE_EMAIL_VERIFICATION="true" once the sending domain is verified.
+const requireEmailVerification =
+  process.env.REQUIRE_EMAIL_VERIFICATION === "true";
 
 export const login = async (
   values: z.infer<typeof LoginSchema>,
@@ -23,6 +31,18 @@ export const login = async (
 
   if (!existingUser || !existingUser.email || !existingUser.password) {
     return { error: "البريد الإلكتروني غير مسجل!" };
+  }
+
+  // Block unverified accounts and re-send a fresh confirmation link.
+  if (requireEmailVerification && !existingUser.emailVerified) {
+    const verificationToken = await generateVerificationToken(existingUser.email);
+    try {
+      await sendVerificationEmail(verificationToken.email, verificationToken.token);
+    } catch (error) {
+      console.error("Failed to resend verification email:", error);
+      return { error: "حسابك غير مفعّل وتعذّر إرسال رابط التفعيل حاليًا" };
+    }
+    return { success: "حسابك غير مفعّل. أرسلنا رابط تأكيد جديد إلى بريدك الإلكتروني" };
   }
 
   // Determine redirect based on user role

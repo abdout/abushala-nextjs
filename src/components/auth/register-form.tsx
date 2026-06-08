@@ -3,7 +3,6 @@
 import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 
@@ -13,10 +12,9 @@ import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { RegisterSchema } from "./validation";
 import { register } from "./register-action";
-import { UserPlus } from "lucide-react";
+import { UserPlus, MailCheck, ArrowRight } from "lucide-react";
 
 export const RegisterForm = () => {
-  const router = useRouter();
   const [error, setError] = useState<string | undefined>("");
   const [success, setSuccess] = useState<string | undefined>("");
   const [isPending, startTransition] = useTransition();
@@ -28,6 +26,7 @@ export const RegisterForm = () => {
       email: "",
       phone: "",
       password: "",
+      confirmPassword: "",
     },
   });
 
@@ -42,12 +41,10 @@ export const RegisterForm = () => {
             setError(data.error);
           }
           if (data?.success) {
+            // Email verification is required — show a "check your inbox" state
+            // instead of bouncing to the login form (the user can't log in yet).
             setSuccess(data.success);
             form.reset();
-            // Redirect to login after successful registration
-            setTimeout(() => {
-              router.push("/login");
-            }, 1500);
           }
         })
         .catch(() => setError("حدث خطأ ما!"));
@@ -70,6 +67,20 @@ export const RegisterForm = () => {
             املأ البيانات التالية لإنشاء حسابك
           </CardDescription>
         </CardHeader>
+        {success ? (
+          <CardContent className="space-y-4">
+            <div className="flex flex-col items-center gap-2 text-emerald-600 py-4">
+              <MailCheck className="w-12 h-12" />
+              <p className="text-center text-sm text-muted-foreground">{success}</p>
+            </div>
+            <Link href="/login" className="w-full block">
+              <Button variant="outline" className="w-full gap-2">
+                <ArrowRight className="w-4 h-4" />
+                الذهاب لتسجيل الدخول
+              </Button>
+            </Link>
+          </CardContent>
+        ) : (
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <CardContent className="space-y-4">
@@ -150,15 +161,30 @@ export const RegisterForm = () => {
                   </FormItem>
                 )}
               />
+              <FormField
+                control={form.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>تأكيد كلمة المرور</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        disabled={isPending}
+                        placeholder="••••••••"
+                        type="password"
+                        dir="ltr"
+                        className="text-right"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               {error && (
                 <div className="bg-destructive/15 p-3 rounded-md text-destructive text-sm text-center">
                   {error}
-                </div>
-              )}
-              {success && (
-                <div className="bg-emerald-500/15 p-3 rounded-md text-emerald-500 text-sm text-center">
-                  {success}
                 </div>
               )}
             </CardContent>
@@ -186,6 +212,7 @@ export const RegisterForm = () => {
             </CardFooter>
           </form>
         </Form>
+        )}
       </Card>
     </div>
   );

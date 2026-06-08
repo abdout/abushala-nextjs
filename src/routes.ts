@@ -1,8 +1,10 @@
 /**
- * Public routes - accessible without authentication
+ * Public routes - accessible without authentication.
+ * The homepage ("/") is intentionally NOT public: exchange rates are gated
+ * behind login. "/about" and "/contact" stay public so guests can read company
+ * info and reach the contact form.
  */
 export const publicRoutes: string[] = [
-  "/",
   "/about",
   "/contact",
 ];
@@ -16,6 +18,7 @@ export const authRoutes = [
   "/error",
   "/reset",
   "/new-password",
+  "/new-verification",
 ];
 
 /**

@@ -1,36 +1,37 @@
 "use server";
 
-import bcrypt from "bcryptjs";
-import { db } from "@/lib/db";
+import * as z from "zod";
+import { ResetSchema } from "@/components/auth/validation";
 import { getUserByEmail } from "@/components/auth/user";
+import { generatePasswordResetToken } from "@/lib/tokens";
+import { sendPasswordResetEmail } from "@/lib/mail";
 
-export const checkEmailExists = async (email: string) => {
-  const user = await getUserByEmail(email.toLowerCase().trim());
+// Generic confirmation shown regardless of whether the email exists — this
+// prevents attackers from enumerating registered accounts via the reset form.
+const GENERIC_SUCCESS =
+  "إذا كان هذا البريد مسجلاً لدينا، فسنرسل إليه رابط إعادة تعيين كلمة المرور";
 
-  if (!user) {
-    return { error: "لا يوجد حساب مرتبط بهذا البريد" };
+export const requestPasswordReset = async (
+  values: z.infer<typeof ResetSchema>
+) => {
+  const validatedFields = ResetSchema.safeParse(values);
+  if (!validatedFields.success) {
+    return { error: "البريد الإلكتروني غير صحيح" };
   }
 
-  return { success: true };
-};
+  const email = validatedFields.data.email.toLowerCase().trim();
+  const existingUser = await getUserByEmail(email);
 
-export const resetPassword = async (email: string, password: string) => {
-  const user = await getUserByEmail(email.toLowerCase().trim());
-
-  if (!user) {
-    return { error: "لا يوجد حساب مرتبط بهذا البريد" };
+  // Only send when the account actually exists, but never reveal that fact.
+  if (existingUser) {
+    const resetToken = await generatePasswordResetToken(email);
+    try {
+      await sendPasswordResetEmail(resetToken.email, resetToken.token);
+    } catch (error) {
+      console.error("Failed to send password reset email:", error);
+      return { error: "تعذر إرسال البريد حاليًا. حاول مرة أخرى لاحقًا" };
+    }
   }
 
-  if (password.length < 6) {
-    return { error: "كلمة المرور يجب أن تكون 6 أحرف على الأقل" };
-  }
-
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  await db.user.update({
-    where: { email: user.email },
-    data: { password: hashedPassword },
-  });
-
-  return { success: "تم تحديث كلمة المرور بنجاح" };
+  return { success: GENERIC_SUCCESS };
 };

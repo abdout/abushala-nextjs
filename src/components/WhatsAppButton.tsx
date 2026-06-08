@@ -11,22 +11,22 @@ const WhatsAppIcon = () => (
 );
 
 const WhatsAppButton = () => {
-  const phoneNumber = "+218918239656"; // Replace with actual phone number
+  const phoneNumber = "+218918239656";
   const message = "مرحباً، أود الاستفسار عن خدمات التحويلات المالية";
+  const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
 
-  const handleWhatsAppClick = () => {
-    const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-    window.open(url, "_blank");
-  };
-
+  // Rendered as a plain link (no onClick) so it works inside Server Components
+  // — e.g. the /about page — without needing client-side hydration.
   return (
     <Button
-      onClick={handleWhatsAppClick}
+      asChild
       className="fixed bottom-6 left-6 w-14 h-14 rounded-full shadow-large hover:shadow-gold transition-smooth z-50 text-white"
       style={{ backgroundColor: '#25D366' }}
       size="icon"
     >
-      <WhatsAppIcon />
+      <a href={url} target="_blank" rel="noopener noreferrer" aria-label="تواصل عبر واتساب">
+        <WhatsAppIcon />
+      </a>
     </Button>
   );
 };
